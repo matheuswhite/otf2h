@@ -18,9 +18,6 @@ class Otf2h:
         self.__bdf_file = file.File(self.fontName, 'bdf')
         self.__header_file = file.File(self.fontName, 'h')
 
-        self.gen_bdf_font()
-        self.gen_h_font()
-
     @staticmethod
     def run_bash_cmd(cmd):
         try:
@@ -57,6 +54,39 @@ class Otf2h:
                 else:
                     __tempValue = __tempValue + c
             return tuple(__output)
+
+    def read_data(self):
+        data = self.__bdf_file.read_line()
+        data_fmt = 0x00
+        number = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'f', 'A', 'B', 'C', 'D', 'E',
+                  'F']
+        for i in range(0, int(len(data)/2), 2):
+            if (data[i] not in number) or (data[i+1] not in number):
+                raise Exception
+            data_fmt |= int(data, 16) << (0xFF << int(i/2))
+
+        return data_fmt
+
+    def read_glyph_bitmap(self, glyph_width, glyph_height):
+        bit = 0
+        data = 0
+        bytes_per_line = int((glyph_width - 1) / 8) + 1
+        n = glyph_height * bytes_per_line
+        data_array = [0x00] * n
+
+        for i in range(0, n):
+            last_bit = bit
+
+            j = i % bytes_per_line
+            if j == 0:
+                data = self.read_data()
+
+            byte = (data & (0xFF << j)) >> j
+            data_array[i] |= byte << bit
+
+            bit = (last_bit + glyph_width) % 8
+
+        return data_array
 
     def gen_bdf_font(self):
         self.run_bash_cmd('sudo chmod 777 mkinstalldirs')
@@ -124,16 +154,13 @@ class Otf2h:
             __glyph.x_advance = __glyph.width
 
             # read bitmap
-            __bitmap = []
-            while 1:
-                __data = self.__bdf_file.read_line()
-                if __data == 'ENDCHAR':
-                    break
-                __bitmap.append(int(__data))
-
+            __bitmap = self.read_glyph_bitmap(__glyph.width, __glyph.height)
+            self.read_cmd('ENDCHAR')
             __font.add_glyph(__glyph, __bitmap)
 
         self.read_cmd('ENDFONT')
+
+        return __font
 
 
 otf2h = Otf2h(str(sys.argv[1]), sys.argv[2])

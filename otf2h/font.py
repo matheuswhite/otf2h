@@ -26,10 +26,6 @@ class Font:
         self.y_resolution = y_resolution
         self.glyph_bounding_box = BoundingBox(glyph_bb_x, glyph_bb_y, glyph_bb_width, glyph_bb_height)
 
-        self.__bitmap_cursor = 0
-
-        pass
-
     def __str__(self):
         return '[{}]'.format()
 
@@ -39,8 +35,6 @@ class Font:
             self.y_advance = self.glyph_bounding_box.height
 
     def add_glyph(self, glyph_, bitmap):
-        glyph_.bitmap_pos = self.__bitmap_cursor
-        self.__bitmap_cursor += len(bitmap)
         for byte in bitmap:
             self.bitmap.append(byte)
 
