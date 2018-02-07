@@ -23,5 +23,5 @@ class File:
     def read_line(self):
         if self.__file is None:
             self.open()
-        return self.__file.readLine()
+        return self.__file.readline()
 

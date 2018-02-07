@@ -10,13 +10,20 @@ class Glyph:
         self.y_offset = y_offset
 
         self.__char = char
-        self.__char_value = ord(self.char)
+        self.__char_value = ord(self.__char)
 
     def __str__(self):
-        return '[{}({})|{},{},{},{},{},{}]'.format(self.__char, hex(self.__char_value), self.bitmap_pos, self.width,
+        out = u'[{}({})|{},{},{},{},{},{}]'.format(self.__char, hex(self.__char_value), self.bitmap_pos, self.width,
                                                    self.height, self.x_advance, self.x_offset, self.y_offset)
+        return out.encode('utf-8')
 
     def set_char(self, char_value):
         self.__char_value = char_value
-        self.__char = chr(char_value)
+        self.__char = unichr(char_value)
+
+    def get_char(self):
+        return self.__char
+
+    def get_char_value(self):
+        return self.__char_value
 
