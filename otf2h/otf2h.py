@@ -19,8 +19,8 @@ class Otf2h:
 		self.__header_file = File(self.fontName, 'h')
 
 		self.gen_bdf_font()
-		font = self.get_fmt_font()
-		for g in font.glyphs:
+		self.font = self.get_fmt_font()
+		for g in self.font.glyphs:
 			print(g)
 
 	@staticmethod
