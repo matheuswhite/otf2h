@@ -1,1 +1,6 @@
 .idea/*
+*.pyc
+Makefile
+arial.bdf
+config.log
+config.status
